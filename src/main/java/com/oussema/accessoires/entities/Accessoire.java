@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Accessoire {
@@ -15,6 +16,15 @@ public class Accessoire {
 	private String libAccessoire;
 	private Double prixAccessoire;
 	private Date dateCreation;
+	@ManyToOne
+	private Marque marque;
+	
+	public Marque getMarque() {
+		return marque;
+	}
+	public void setMarque(Marque marque) {
+		this.marque = marque;
+	}
 	public Accessoire() {
 		super();
 		// TODO Auto-generated constructor stub
