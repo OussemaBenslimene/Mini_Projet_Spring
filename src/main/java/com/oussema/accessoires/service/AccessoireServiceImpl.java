@@ -9,11 +9,15 @@ import org.springframework.stereotype.Service;
 import com.oussema.accessoires.entities.Accessoire;
 import com.oussema.accessoires.entities.Marque;
 import com.oussema.accessoires.repos.AccessoireRepository;
+import com.oussema.accessoires.repos.MarqueRepository;
 
 @Service
 public class AccessoireServiceImpl implements AccessoireService {
 	@Autowired
 	AccessoireRepository accessoireRepository;
+	
+	@Autowired
+	MarqueRepository marqueRepos;
 
 	@Override
 	public Accessoire saveAccessoire(Accessoire p) {
@@ -85,5 +89,9 @@ public class AccessoireServiceImpl implements AccessoireService {
 	public List<Accessoire> trierAccessoiresLibsPrix() {
 		return accessoireRepository.trierAccessoiresLibsPrix();
 	}
+
+	@Override
+	public List<Marque> getAllMarques() {
+		return marqueRepos.findAll();	}
 
 }

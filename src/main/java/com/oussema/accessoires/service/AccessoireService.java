@@ -29,5 +29,7 @@ public interface AccessoireService {
 	List<Accessoire> findByMarqueIdMar(Long id);
 	List<Accessoire> findByOrderByLibAccessoireAsc();
 	List<Accessoire> trierAccessoiresLibsPrix();
+	
+	List<Marque> getAllMarques();
 
 }

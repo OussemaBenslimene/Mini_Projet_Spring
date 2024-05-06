@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.oussema.accessoires.entities.Accessoire;
+import com.oussema.accessoires.entities.Marque;
 import com.oussema.accessoires.service.AccessoireService;
+
+import jakarta.validation.Valid;
 
 
 @Controller
@@ -38,28 +42,49 @@ public class AccessoireController {
 	}
 
 	@RequestMapping("/showCreate")
-	public String showCreate() {
-		return "createAccessoire";
+	public String showCreate(ModelMap modelMap) {
+		
+		List<Marque> mqs = accessoireService.getAllMarques();
+		modelMap.addAttribute("accessoire", new Accessoire());
+		modelMap.addAttribute("mode", "new");
+		modelMap.addAttribute("marques", mqs);
+		return "formAccessoire";
 	}
 
 	@RequestMapping("/saveAccessoire")
-	public String saveAccessoire(@ModelAttribute("produit") Accessoire accessoire, @RequestParam("date") String date,
-			ModelMap modelMap) throws ParseException {
-//conversion de la date
-		SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-		Date dateCreation = dateformat.parse(String.valueOf(date));
-		accessoire.setDateCreation(dateCreation);
+	public String saveAccessoire(@Valid Accessoire accessoire,
+			BindingResult bindingResult,
+			@RequestParam (name = "page" , defaultValue = "0") int page,
+			@RequestParam (name = "size" , defaultValue = "2") int size ) {
+		System.out.println(page + " " + size);
+		
+		int currentPage;
+		boolean isNew = false;
 
-		Accessoire saveProduit = accessoireService.saveAccessoire(accessoire);
-		String msg = "Accessoire enregistré avec Id " + saveProduit.getIdAccessoire();
-		modelMap.addAttribute("msg", msg);
-		return "createAccessoire";
+		
+		if (bindingResult.hasErrors()) return "formAccessoire";
+		
+		if (accessoire.getIdAccessoire()==null) //ajout
+			isNew=true;
+
+		
+		accessoireService.saveAccessoire(accessoire);
+		if (isNew) //ajout
+		{
+		Page<Accessoire> accs = accessoireService.getAllAccessoiresParPage(page, size);
+		currentPage = accs.getTotalPages()-1;
+		}
+		else //modif
+		currentPage=page;
+		//return "ListeProduits";
+		return ("redirect:/ListeAccessoires?page="+currentPage+"&size="+size);
 	}
 
 	@RequestMapping("/supprimerAccessoire")
 	public String supprimerAccessoire(@RequestParam("id") Long id, ModelMap modelMap,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "2") int size) {
+		
 		accessoireService.deleteAccessoireById(id);
 		Page<Accessoire> acc = accessoireService.getAllAccessoiresParPage(page, size);
 		modelMap.addAttribute("accessoires", acc);
@@ -70,10 +95,18 @@ public class AccessoireController {
 	}
 
 	@RequestMapping("/modifierAccessoire")
-	public String editerProduit(@RequestParam("id") Long id, ModelMap modelMap) {
+	public String editerProduit(@RequestParam("id") Long id, ModelMap modelMap,
+			@RequestParam (name = "page" , defaultValue = "0") int page,
+			@RequestParam (name = "size" , defaultValue = "2") int size) {
+		
 		Accessoire p = accessoireService.getAccessoire(id);
+		List<Marque> mqs = accessoireService.getAllMarques();
 		modelMap.addAttribute("accessoire", p);
-		return "editerAccessoire";
+		modelMap.addAttribute("mode", "edit");
+		modelMap.addAttribute("marques", mqs);
+		modelMap.addAttribute("page", page);
+		modelMap.addAttribute("size", size);
+		return "formAccessoire";
 	}
 
 	@RequestMapping("/updateAccessoire")
