@@ -33,16 +33,21 @@
 						<td th:if= "${!#strings.isEmpty(p.marque)}" th:text="${p.marque.nomMar}"></td>
 						<td th:if= "${#strings.isEmpty(p.marque)}" th:text="${'Pas de Marque'}"></td>
 						<td th:text="${p.dateCreation}"></td>
-						<td><a class="btn btn-danger" onclick="return confirm('Etes-vous sûr ?')" th:href="@{supprimerAccessoire(id=${p.idAccessoire},
+						
+						<td><a sec:authorize="hasAuthority('ADMIN')" class="btn btn-danger"
+						onclick="return confirm('Etes-vous sûr ?')"
+						th:href="@{supprimerAccessoire(id=${p.idAccessoire},
 						page=${currentPage},size=${size})}">Supprimer</a>
-					<a class="btn btn-success" th:href="@{modifierAccessoire(id=${p.idAccessoire},page=${currentPage},size=${size})}">Editer</a></td>
+						
+						<a sec:authorize="hasAuthority('ADMIN')" class="btn btn-success"
+						th:href="@{modifierAccessoire(id=${p.idAccessoire} , page=${currentPage},size=${size})}">Editer</a></td>
 						
 					</tr>
 				</table>
 				<ul class="nav nav-pills">
 					<li th:each="page,status:${pages}">
 						<a th:class="${status.index==currentPage?'btn btn-primary':'btn' }"
-							th:href="@{ ListeAccessoires(page=${status.index}, size=${size} ) }"
+							th:href="@{ListeAccessoires(page=${status.index}, size=${size} ) }"
 							th:text="${status.index }"></a>
 					</li>
 
